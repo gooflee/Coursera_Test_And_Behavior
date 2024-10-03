@@ -104,3 +104,18 @@ class TestProductModel(unittest.TestCase):
     #
     # ADD YOUR TEST CASES HERE
     #
+
+    def test_read_product(self):
+        """ Test reading a product """
+        
+        product = ProductFactory()        
+        app.logger.info("created product: %s", product)
+        product.id = None
+        product.create()
+        self.assertIsNotNone(product.id)
+        retProduct = product.find(product.id)
+        self.assertEqual(retProduct.name, product.name)
+        self.assertEqual(retProduct.description, product.description)
+        self.assertEqual(Decimal(retProduct.price), product.price)
+        self.assertEqual(retProduct.available, product.available)
+        self.assertEqual(retProduct.category, product.category)
