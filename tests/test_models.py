@@ -109,7 +109,7 @@ class TestProductModel(unittest.TestCase):
         """ Test reading a product """
 
         product = ProductFactory()
-        app.logger.info("created product: %s", product)
+        logging.debug("created product: %s", product)
         product.id = None
         product.create()
         self.assertIsNotNone(product.id)
@@ -123,11 +123,11 @@ class TestProductModel(unittest.TestCase):
     def test_update_product(self):
         """ Test update a project """
         product = ProductFactory()
-        app.logger.info("created product: %s", product)
+        logging.debug("created product: %s", product)
         product.id = None
         product.create()
         self.assertIsNotNone(product.id)
-        app.logger.info("created product: %s", product)
+        logging.debug("created product: %s", product)
         product.description = "This has been updated"
         original_id = product.id
         product.update()
