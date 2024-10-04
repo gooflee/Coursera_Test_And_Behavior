@@ -138,6 +138,11 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(original_id,products[0].id)
         self.assertEqual(products[0].description,"This has been updated")
 
+        # test updating with empty id
+        product = ProductFactory()
+        product.id = ''
+        self.assertRaises(DataValidationError, product.update)
+
     def test_delete_a_product(self):
         """ Test delete a product """
         product = ProductFactory()
@@ -228,6 +233,12 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(num_of_items, same_price.count())
         for prod in same_price:
             self.assertEqual(prod.price,first_price)
+        
+        # test price as string
+        same_price =  Product.find_by_price(str(first_price))
+        self.assertEqual(num_of_items, same_price.count())
+        for prod in same_price:
+            self.assertEqual(prod.price,first_price)
 
     def test_serialize_product(self):
         """ test serialize_product """
@@ -263,6 +274,10 @@ class TestProductModel(unittest.TestCase):
         
         # test sending bad category type
         prod_dict["category"] = None
+        self.assertRaises(DataValidationError, product.deserialize,prod_dict)
+
+        # Test available as a string
+        prod_dict["available"] = "chcuc"
         self.assertRaises(DataValidationError, product.deserialize,prod_dict)
 
         # test send empty dictionary
