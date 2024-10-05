@@ -20,7 +20,7 @@ Product Store Service with UI
 """
 from flask import jsonify, request, abort
 from flask import url_for  # noqa: F401 pylint: disable=unused-import
-from service.models import Product
+from service.models import Product, Category
 from service.common import status  # HTTP Status Codes
 from . import app
 
@@ -90,7 +90,7 @@ def create_products():
     # Uncomment this line of code once you implement READ A PRODUCT
     #
     location_url = url_for("get_products", product_id=product.id, _external=True)
-    #location_url = "/"  # delete once READ is implemented
+    # location_url = "/"  # delete once READ is implemented
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
@@ -102,6 +102,34 @@ def create_products():
 # PLACE YOUR CODE TO LIST ALL PRODUCTS HERE
 #
 
+@app.route("/products", methods=["GET"])
+def get_all_products():
+    """ Return all products """
+    app.logger.info("Processing get all products")
+
+    products_list = []
+
+    name = request.args.get("name")
+    category = request.args.get("category")
+    available = request.args.get("available")
+
+    if name:
+        app.logger.info("Find by name: %s", name)
+        products_list = Product.find_by_name(name)
+    elif category:
+        app.logger.info("Find by category: %s", category)
+        category_value = getattr(Category, category.upper())
+        products_list = Product.find_by_category(category_value)
+    elif available:
+        app.logger.info("Find by available: %s", available)
+        availablity = available.lower() in ["true", "yes", 1]
+        products_list = Product.find_by_availability(availablity)
+    else:
+        products_list = Product.all()
+
+    data = [product.serialize() for product in products_list]
+    return data, status.HTTP_200_OK
+
 ######################################################################
 # R E A D   A   P R O D U C T
 ######################################################################
@@ -109,6 +137,7 @@ def create_products():
 #
 # PLACE YOUR CODE HERE TO READ A PRODUCT
 #
+
 
 @app.route("/products/<product_id>", methods=["GET"])
 def get_products(product_id):
@@ -127,6 +156,8 @@ def get_products(product_id):
 #
 # PLACE YOUR CODE TO UPDATE A PRODUCT HERE
 #
+
+
 @app.route("/products/<product_id>", methods=["PUT"])
 def update_products(product_id):
     """ Update product with product_id """
@@ -135,13 +166,11 @@ def update_products(product_id):
     product = Product.find(product_id)
     if product is None:
         return {}, status.HTTP_404_NOT_FOUND
-    
+
     product.name = data["name"]
     product.description = data["description"]
     product = product.serialize()
     return product, status.HTTP_200_OK
-    
-
 
 ######################################################################
 # D E L E T E   A   P R O D U C T
@@ -151,6 +180,8 @@ def update_products(product_id):
 #
 # PLACE YOUR CODE TO DELETE A PRODUCT HERE
 #
+
+
 @app.route("/products/<product_id>", methods=["DELETE"])
 def delete_products(product_id):
     """ Delete product with product_id """
