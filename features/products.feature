@@ -79,14 +79,15 @@ Scenario: Delete a product
     And I set the "Name" to "Shoes"
     And I press the "Search" button
     Then I should see the message "Success"
-    When I press the "Delete" button
-    Then I should see the message "Success"
+    And I should see "Blue shoes" in the "Description" field
     When I copy the "Id" field
     And I press the "Clear" button
     And I paste the "Id" field
-    And I press the "Retrieve" button
-    Then I should see the message "Success"
-    And I should not see "Shoes"
+    When I press the "Delete" button
+    Then I should see the message "Product has been Deleted!"
+    When I press the "Clear" button
+    And I press the "Search" button
+    Then I should not see "Shoes" in the results
 
 Scenario: List all products
     When I visit the "Home Page"
@@ -108,16 +109,18 @@ Scenario: Search a product based on Category
 
 Scenario: Search a product based on Available
     When I visit the "Home Page"
-    And I set the "Available" to "True"
+    And I select "True" in the "Available" dropdown
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "Hat" in the results
     And I should see "Big Mac" in the results
     And I should see "Sheets" in the results
+    And I should not see "Shoes" in the results
 
 Scenario: Search a product based on Name
     When I visit the "Home Page"
     And I set the "Name" to "Big Mac"
     And I press the "Search" button
     Then I should see the message "Success"
-    And I should see "Big Mac" in the results
+    And I should see "Big Mac" in the "Name" field
+    And I should see "1/4 lb burger" in the "Description" field
