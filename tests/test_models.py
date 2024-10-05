@@ -29,8 +29,9 @@ import unittest
 from decimal import Decimal
 from service.models import Product, Category, db
 from service import app
-from tests.factories import ProductFactory
 from service.models import DataValidationError
+from tests.factories import ProductFactory
+
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
 )
@@ -113,12 +114,12 @@ class TestProductModel(unittest.TestCase):
         product.id = None
         product.create()
         self.assertIsNotNone(product.id)
-        retProduct = product.find(product.id)
-        self.assertEqual(retProduct.name, product.name)
-        self.assertEqual(retProduct.description, product.description)
-        self.assertEqual(Decimal(retProduct.price), product.price)
-        self.assertEqual(retProduct.available, product.available)
-        self.assertEqual(retProduct.category, product.category)
+        ret_product = product.find(product.id)
+        self.assertEqual(ret_product.name, product.name)
+        self.assertEqual(ret_product.description, product.description)
+        self.assertEqual(Decimal(ret_product.price), product.price)
+        self.assertEqual(ret_product.available, product.available)
+        self.assertEqual(ret_product.category, product.category)
 
     def test_update_product(self):
         """ Test update a project """
@@ -156,10 +157,10 @@ class TestProductModel(unittest.TestCase):
         products = Product.all()
         self.assertEqual(len(products), 0)
 
-        for i in range(5):
-            product = ProductFactory()
+        products = ProductFactory.create_batch(5)
+        for product in products:
             product.create()
-        products = product.all()
+        products = Product.all()
         self.assertEqual(len(products), 5)
 
     def test_find_product_by_name(self):
@@ -244,10 +245,10 @@ class TestProductModel(unittest.TestCase):
     def test_serialize_product(self):
         """ test serialize_product """
         product = ProductFactory()
-        dict = product.serialize()
+        prod_dict = product.serialize()
         keys = ["id", "name", "description", "price", "available", "category"]
         for key in keys:
-            self.assertIn(key, dict.keys())
+            self.assertIn(key, prod_dict.keys())
 
     def test_deserialize_product(self):
         """ test deserialize product """

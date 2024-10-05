@@ -174,7 +174,7 @@ class TestProductRoutes(TestCase):
         test_product = self._create_products()[0]
         logging.debug("created product: %s", test_product)
         get_url = BASE_URL+'/'+str(test_product.id)
-        logging.debug(f"the get URL is {get_url}")
+        logging.debug("the get URL is %s", get_url)
         response = self.client.get(get_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         new_product = response.get_json()
@@ -205,6 +205,7 @@ class TestProductRoutes(TestCase):
         self.assertEqual(updated_text, updated_product["description"])
 
     def test_delete_product(self):
+        """ It should allow produts to be deleted """
         test_product = self._create_products()[0]
         test_product = test_product.serialize()
         product_id = test_product["id"]
